@@ -21,7 +21,7 @@ class DirEntry(Entry):
     def readClass(sefl, className:str) -> Tuple[bytes,Entry,str]:
         fileName = os.path.join(path, className)
         err = ""
-        data = bytes(open(fileName,'r').read())
+        data = bytes(''.join(open(fileName,'r').readlines()))
         return (data,self,err)
 
     @property

@@ -1,18 +1,49 @@
+import sys
 import argparse
 import classpath
+import classfile
 
 __version__ = "0.0.1"
 __author__ = "shiyi.liu"
+
+def loadClass(className:str, cp:classpath.Classpath) -> classfile.ClassFile:
+    classData, _, err = cp.ReadClass(className)
+    if err != None:
+        raise IOError(err)
+    cf, err = classfile.Parse(classData)
+    if err != None:
+        raise ValueError(err)
+    return cf
+
+def printClassInfo(cf: classfile.ClassFile):
+    print (f"version: {cf.MajorVersion}.{cf.MinorVersion}")
+    print (f"constants count: {len(cf.ConstantPool)}")
+    print (f"access flag: {cf.AccessFlags}")
+    print (f"this class: {cf.ClassName}")
+    print (f"super class: {cf.SuperClassName}")
+    print (f"interfaces: {cf.InterfaceNames}")
+    print (f"fiels count: {len(cf.Fields)}")
+    for f in cf.Fields:
+        print (f" {f.Name()}")
+    print (f"methods count: {len(cf.Methods)}")
+    for m in cf.Methods:
+        print (f" {m.Name()}")
 
 def startJVM(args):
     cp = classpath.Parse(args.Xjre, args.classpath)
     print(f"classpath:{cp}, class{args.Class}, args: {args}")
     className = args.Class.replace(".","/")
+    cf = loadClass(className, cp)
+    print (args.Class)
+    printClassInfo(cf)
     classData, _, err = cp.ReadClass(className)
-    if err != None:
-        print(f"Could not find or load main class {args.Class}")
-        return
-    print(f"classdata:{classData}")
+    #classData = [int.from_bytes(x,byteorder='big',signed=False) for x in classData]
+    #for x in classData:
+    #    print(x, end=' ')
+    #if err != None:
+    #    print(f"Could not find or load main class {args.Class}")
+    #    return
+    #print(f"classdata:{classData}")
 
 def main():
     parser = argparse.ArgumentParser()
