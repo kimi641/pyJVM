@@ -1,7 +1,7 @@
 import struct
 
-from .class_read import ClassReader
-from .cp_variables import *
+from classfile.class_read import ClassReader
+from classfile.cp_variables import *
 
 CONSTANT_Class              = 7
 CONSTANT_Fieldref           = 9

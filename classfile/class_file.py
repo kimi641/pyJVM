@@ -3,10 +3,10 @@ import struct
 
 from typing import List
 
-from .class_read import ClassReader
-from .member_info import readMembers
-from .constant_pool import readConstantPool
-from .attribute_info import readAttributes
+from classfile.class_read import ClassReader
+from classfile.member_info import readMembers
+from classfile.constant_pool import readConstantPool
+from classfile.attribute_info import readAttributes
 
 class ClassFile:
     def __init__(self):

@@ -2,7 +2,7 @@ import struct
 from abc import ABCMeta, abstractmethod
 
 from typing import Tuple
-from .class_read import ClassReader
+from classfile.class_read import ClassReader
 
 class ConstantInfo(metaclass=ABCMeta):
     @abstractmethod

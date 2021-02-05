@@ -2,8 +2,8 @@ import struct
 from typing import List
 from abc import ABCMeta, abstractmethod
 
-from .class_read import ClassReader
-from .constant_pool import ConstantPool
+from classfile.class_read import ClassReader
+from classfile.constant_pool import ConstantPool
 
 class AttributeInfo(metaclass=ABCMeta):
     @abstractmethod

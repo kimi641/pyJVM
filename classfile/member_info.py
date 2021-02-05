@@ -1,7 +1,7 @@
 from typing import List
 
-from .class_read import ClassReader
-from .attribute_info import readAttributes
+from classfile.class_read import ClassReader
+from classfile.attribute_info import readAttributes
 
 class MemberInfo:
     def __init__(self,
