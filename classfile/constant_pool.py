@@ -1,8 +1,8 @@
 from typing import Tuple
 
-from .class_read import ClassReader
-from .constant_info import readConstantInfo
-from .cp_variables import *
+from classfile.class_read import ClassReader
+from classfile.constant_info import readConstantInfo
+from classfile.cp_variables import *
 
 class ConstantPool(list):
     def getConstantInfo(self, index):
