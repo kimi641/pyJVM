@@ -1,11 +1,22 @@
-from jvm.rtda.slot import newLocalVars, newOperandStack
+from rtda.slot import newLocalVars, newOperandStack
 class Frame:
-    def __init__(self, localVars, operandStack):
+    def __init__(self, thread, localVars, operandStack):
+        self.thread = thread
         self.LocalVars = localVars
         self.OperandStack = operandStack
+        self.nextPC = 0
 
-def newFrame(maxLocals, maxStack:int) -> Frame:
-    return Frame(localVars = newLocalVars(maxLocals),
+    @property
+    def NextPC(self) -> int:
+        return self.nextPC
+
+    @nextPC.setter
+    def SetNextPC(self, nextPC:int):
+        self.nextPC = nextPC
+
+def newFrame(thread, maxLocals, maxStack:int) -> Frame:
+    return Frame(thread = thread,
+                 localVars = newLocalVars(maxLocals),
                  operandStack = newOperandStack(maxStack))
 
 class Stack:
@@ -57,6 +68,9 @@ class Thread:
 
     def CurrentFrame(self, frame):
         return self.stack.top()
+
+    def NewFrame(self, maxLocals, maxStack) -> Frame:
+        return newFrame(self, maxLocals, maxStack)
 
 def newThread() -> Thread:
     return Thread(stack = newStack(1024))
