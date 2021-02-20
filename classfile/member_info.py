@@ -1,7 +1,7 @@
 from typing import List
 
 from classfile.class_read import ClassReader
-from classfile.attribute_info import readAttributes
+from classfile.attribute_info import readAttributes,CodeAttribute
 
 class MemberInfo:
     def __init__(self,
@@ -25,6 +25,12 @@ class MemberInfo:
         
     def Descriptor(self) -> str:
         return self.cp.getUtf8(self.descriptorIndex)
+
+    def CodeAttribute(self) -> CodeAttribute:
+        for attrInfo in self.attributes:
+            if isinstance(attrInfo,CodeAttribute):
+                return attrInfo
+        return None
 
 def readMembers(reader:ClassReader, cp) -> List[MemberInfo]:
     memberCount = reader.readUint16()
