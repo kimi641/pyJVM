@@ -102,6 +102,14 @@ class OperandStack:
         self.slots[self.size].ref = None
         return ref
 
+    def PushSlot(self, slot:Slot):
+        self.slots[self.size] = slot
+        self.size += 1
+
+    def PopSlot(self):
+        self.size -= 1
+        return self.slots[self.size]
+
 def newOperandStack(maxStack:int) -> OperandStack:
     if maxStack > 0:
         slots = []
