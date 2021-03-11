@@ -66,7 +66,7 @@ class LCONST_1(instructions.base.NoOperandsInstruction):
         frame.OperandStack().PushLong(1)
 
 class BIPUSH:
-    def FetchOperands(self, reader:base.BytecodeReader):
+    def FetchOperands(self, reader:instructions.base.BytecodeReader):
         self.val = reader.ReadInt8()
 
     def Execute(self, frame:rtda.Frame):
@@ -74,7 +74,7 @@ class BIPUSH:
         frame.OperandStack().PushInt(i)
 
 class SIPUSH:
-    def FetchOperands(self, reader:base.BytecodeReader):
+    def FetchOperands(self, reader:instructions.base.BytecodeReader):
         sefl.val = reader.ReadInt16()
 
     def Execute(self, frame:rtda.Frame):

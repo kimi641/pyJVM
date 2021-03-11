@@ -17,7 +17,7 @@ class D2I(instructions.base.NoOperandsInstruction):
         i = struct.unpack('>i',struct.pack('>d',d))[0]
         stack.pushInf(i)
 
- class D2L(instructions.base.NoOperandsInstruction):
+class D2L(instructions.base.NoOperandsInstruction):
     def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         d = stack.PopDoulbe()

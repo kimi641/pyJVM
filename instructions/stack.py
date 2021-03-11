@@ -2,25 +2,25 @@ import instructions.base
 import rtda
 
 class POP:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         stack.PopSlot()
 
 class POP2:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         stack.PopSlot()
         stack.PopSlot()
 
 class DUP:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot = stack.PopSlot()
         stack.PushSlot(slot)
         stack.PushSlot(slot)
 
 class DUP_X1:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot1 = stack.PopSlot()
         slot2 = stack.PopSlot()
@@ -29,7 +29,7 @@ class DUP_X1:
         stack.PushSLot(slot1)
 
 class DUP_X2:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot1 = stack.PopSlot()
         slot2 = stack.PopSlot()
@@ -40,7 +40,7 @@ class DUP_X2:
         stack.PushSLot(slot1)
 
 class DUP2:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot1 = stack.PopSlot()
         slot2 = stack.PopSlot()
@@ -50,7 +50,7 @@ class DUP2:
         stack.PushSLot(slot1)
 
 class DUP2_X1:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot1 = stack.PopSlot()
         slot2 = stack.PopSlot()
@@ -61,8 +61,8 @@ class DUP2_X1:
         stack.PushSlot(slot2)
         stack.PushSLot(slot1)
 
-class DUP2_X2
-    def Execute(self, frame:jvm.rtda.Frame):
+class DUP2_X2:
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot1 = stack.PopSlot()
         slot2 = stack.PopSlot()
@@ -76,7 +76,7 @@ class DUP2_X2
         stack.PushSLot(slot1)
 
 class SWAP:
-    def Execute(self, frame:jvm.rtda.Frame):
+    def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         slot1 = stack.PopSlot()
         slot2 = stack.PopSlot()

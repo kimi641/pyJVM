@@ -20,12 +20,15 @@ class MemberInfo:
     def AccessFlags(self):
         return self.accessFlags
 
+    @property
     def Name(self) -> str:
         return self.cp.getUtf8(self.nameIndex)
         
+    @property
     def Descriptor(self) -> str:
         return self.cp.getUtf8(self.descriptorIndex)
 
+    @property
     def CodeAttribute(self) -> CodeAttribute:
         for attrInfo in self.attributes:
             if isinstance(attrInfo,CodeAttribute):
