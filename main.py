@@ -3,6 +3,8 @@ import argparse
 import classpath
 import classfile
 
+from interpreter import interpret
+
 __version__ = "0.0.1"
 __author__ = "shiyi.liu"
 
@@ -29,14 +31,25 @@ def printClassInfo(cf: classfile.ClassFile):
     for m in cf.Methods:
         print (f" {m.Name()}")
 
+def getMainMethod(cf:classfile.ClassFile) -> classfile.MemberInfo:
+    for m in cf.Methods:
+        if m.Name == "main" and m.Descriptor == "([Ljava/lang/String;)V":
+            return m
+    return None
+
 def startJVM(args):
     cp = classpath.Parse(args.Xjre, args.classpath)
     print(f"classpath:{cp}, class{args.Class}, args: {args}")
     className = args.Class.replace(".","/")
     cf = loadClass(className, cp)
     print (args.Class)
-    printClassInfo(cf)
-    classData, _, err = cp.ReadClass(className)
+    mainMethod = getMainMethod(cf)
+    if mainMethod != None:
+        interpret(mainMethod)
+    else:
+        print(f"Main method not found in class {args.Class}")
+    #printClassInfo(cf)
+    #classData, _, err = cp.ReadClass(className)
     #classData = [int.from_bytes(x,byteorder='big',signed=False) for x in classData]
     #for x in classData:
     #    print(x, end=' ')

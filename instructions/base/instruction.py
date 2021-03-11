@@ -36,6 +36,10 @@ class BytecodeReader:
     def SkipPadding(self):
         pass
 
+    @property
+    def PC(self):
+        return self.pc
+
 class Instruction(metaclass=ABCMeta):
 
     @abstractmethod
@@ -50,7 +54,7 @@ class NoOperandsInstruction(Instruction):
     def FetchOperands(self, reader:BytecodeReader):
         pass
 
-class BranchInstuction(Instruction):
+class BranchInstruction(Instruction):
     def FetchOperands(self, reader:BytecodeReader):
         self.Offset = reader.ReadInt16()
 

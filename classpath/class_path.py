@@ -18,10 +18,10 @@ class DirEntry(Entry):
     def __init__(self,path:str):
         self.absDir = path
 
-    def readClass(sefl, className:str) -> Tuple[bytes,Entry,str]:
-        fileName = os.path.join(path, className)
-        err = ""
-        data = bytes(''.join(open(fileName,'r').readlines()))
+    def readClass(self, className:str) -> Tuple[bytes,Entry,str]:
+        fileName = os.path.join(self.absDir, className)
+        err = None
+        data = open(fileName,'rb').read()
         return (data,self,err)
 
     @property

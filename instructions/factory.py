@@ -1,5 +1,6 @@
 import instructions.base
 from instructions.comparisons import *
+from instructions.constants import *
 from instructions.control import *
 from instructions.conversions import *
 from instructions.extended import *
@@ -130,7 +131,7 @@ fcmpg       = FCMPG()
 dcmpl       = DCMPL()
 dcmpg       = DCMPG()
 
-def NewInstructions(opcode) -> instructions.base.Instruction:
+def NewInstruction(opcode) -> instructions.base.Instruction:
     if opcode == 0x00:
         return nop
     elif opcode == 0x01:
@@ -481,7 +482,7 @@ def NewInstructions(opcode) -> instructions.base.Instruction:
     #elif opcode == 0xc5:
     elif opcode == 0xc6:
         return IFNULL()
-    elif opcode == 0xc7
+    elif opcode == 0xc7:
         return IFNONNULL()
     elif opcode == 0xc8:
         return GOTO_W()
@@ -490,4 +491,4 @@ def NewInstructions(opcode) -> instructions.base.Instruction:
     #elif opcode == 0xfe:
     #elif opcode == 0xff:
     else:
-        raise ValueError(f"Unsupported opcode{opcode}")
+        raise ValueError(f"Unsupported opcode:{opcode}")

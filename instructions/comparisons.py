@@ -49,14 +49,14 @@ def _acmp(frame:rtda.Frame) -> bool:
     ref1 = stack.PopRef()
     return ref1 == ref2 #todo
 
-class IF_ACMPEQ(instructions.base.BranchInstuction):
+class IF_ACMPEQ(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         if _acmp(frame):
             instructions.base.Branch(frame, self.Offset)
 
-class IF_ACMPNE(instructions.base.BranchInstuction):
+class IF_ACMPNE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
-        if !_acmp(frame):
+        if not _acmp(frame):
             instructions.base.Branch(frame, self.Offset)
 
 def _icmpPop(frame:rtda.Frame):
@@ -65,73 +65,73 @@ def _icmpPop(frame:rtda.Frame):
     val1 = stack.PopInt()
     return val1,val2
 
-class IF_ICMPEQ(instructions.base.BranchInstuction):
+class IF_ICMPEQ(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val1,val2 = _icmpPop(frame)
         if val1 == val2:
             instructions.base.Branch(frame, self.Offset)
 
-class IF_ICMPNE(instructions.base.BranchInstuction):
+class IF_ICMPNE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val1,val2 = _icmpPop(frame)
         if val1 != val2:
             instructions.base.Branch(frame, self.Offset)
 
-class IF_ICMPLT(instructions.base.BranchInstuction):
+class IF_ICMPLT(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val1,val2 = _icmpPop(frame)
         if val1 < val2:
             instructions.base.Branch(frame, self.Offset)
 
-class IF_ICMPLE(instructions.base.BranchInstuction):
+class IF_ICMPLE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val1,val2 = _icmpPop(frame)
         if val1 <= val2:
             instructions.base.Branch(frame, self.Offset)
 
-class IF_ICMPGT(instructions.base.BranchInstuction):
+class IF_ICMPGT(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val1,val2 = _icmpPop(frame)
         if val1 > val2:
             instructions.base.Branch(frame, self.Offset)
 
-class IF_ICMPGE(instructions.base.BranchInstuction):
+class IF_ICMPGE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val1,val2 = _icmpPop(frame)
         if val1 >= val2:
             instructions.base.Branch(frame, self.Offset)
 
-class IFEQ(instructions.base.BranchInstuction):
+class IFEQ(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val = frame.OperandStack().PopInt()
         if val == 0:
             instructions.base.Branch(frame, self.Offset)
 
-class IFNE(instructions.base.BranchInstuction):
+class IFNE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val = frame.OperandStack().PopInt()
         if val != 0:
             instructions.base.Branch(frame, self.Offset)
 
-class IFLT(instructions.base.BranchInstuction):
+class IFLT(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val = frame.OperandStack().PopInt()
         if val < 0:
             instructions.base.Branch(frame, self.Offset)
 
-class IFLE(instructions.base.BranchInstuction):
+class IFLE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val = frame.OperandStack().PopInt()
         if val <= 0:
             instructions.base.Branch(frame, self.Offset)
 
-class IFGT(instructions.base.BranchInstuction):
+class IFGT(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val = frame.OperandStack().PopInt()
         if val > 0:
             instructions.base.Branch(frame, self.Offset)
 
-class IFGE(instructions.base.BranchInstuction):
+class IFGE(instructions.base.BranchInstruction):
     def Execute(self, frame:rtda.Frame):
         val = frame.OperandStack().PopInt()
         if val >= 0:
