@@ -13,21 +13,29 @@ class ConstantIntegerInfo(ConstantInfo):
     def readInfo(self,reader:ClassReader):
         bts = reader.readUint32()
         self.val = struct.unpack('>i',bts)[0]
+    def Value(self):
+        return self.val
 
 class ConstantFloatInfo(ConstantInfo):
     def readInfo(self,reader:ClassReader):
         bts = reader.readUint32()
         self.val = struct.unpack('>f',bts)[0]
+    def Vaule(self):
+        return self.val
 
 class ConstantLongInfo(ConstantInfo):
     def readInfo(self,reader:ClassReader):
         bts = reader.readUint64()
         self.val = struct.unpack('>q',bts)[0]
+    def Value(self):
+        return self.val
 
 class ConstantDoubleInfo(ConstantInfo):
     def readInfo(self,reader:ClassReader):
         bts = reader.readUint64()
         self.val = struct.unpack('>d',bts)[0]
+    def Vaule(self):
+        return self.val
 
 class ConstantUtf8Info(ConstantInfo):
     def readInfo(self,reader:ClassReader):

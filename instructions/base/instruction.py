@@ -60,8 +60,8 @@ class BranchInstruction(Instruction):
 
 class Index8Instruction(Instruction):
     def FetchOperands(self, reader:BytecodeReader):
-        self.Offset = reader.ReadUint8()
+        self.Index = reader.ReadUint8()
 
 class Index16Instruction(Instruction):
     def FetchOperands(self, reader:BytecodeReader):
-        self.Offset = reader.ReadUint16()
+        self.Index = reader.ReadUint16()
