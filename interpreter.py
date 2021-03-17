@@ -2,6 +2,7 @@ import classfile
 import instructions
 import instructions.base
 import rtda
+import rtda.heap
 
 def loop(thread:rtda.Thread, bytecode):
     frame = thread.PopFrame()
@@ -19,18 +20,13 @@ def loop(thread:rtda.Thread, bytecode):
         print(f"pc:{pc} inst:{inst}")
         inst.Execute(frame)
 
-def interpret(methodInfo: classfile.MemberInfo):
-    codeAttr = methodInfo.CodeAttribute
-    maxLocals = codeAttr.maxLocals
-    maxStack = codeAttr.maxStack
-    bytecode = codeAttr.code
-
+def interpret(method: rtda.heap.Method):
     thread = rtda.NewThread()
-    frame = thread.NewFrame(maxLocals, maxStack)
+    frame = thread.NewFrame(method)
     thread.PushFrame(frame)
 
-    try:
-        loop(thread, bytecode)
-    except:
-        print(f"LocalVars: {frame.LocalVars()[1].num}")
-        print(f"OperandStack: {frame.OperandStack()}")
+    #try:
+    loop(thread, method.Code())
+    #except:
+    #    print(f"LocalVars: {frame.LocalVars()[1].num}")
+    #    print(f"OperandStack: {frame.OperandStack()}")

@@ -1,7 +1,7 @@
 from typing import List
 
 from classfile.class_read import ClassReader
-from classfile.attribute_info import readAttributes,CodeAttribute
+from classfile.attribute_info import readAttributes,CodeAttribute,ConstantValueAttribute
 
 class MemberInfo:
     def __init__(self,
@@ -32,6 +32,12 @@ class MemberInfo:
     def CodeAttribute(self) -> CodeAttribute:
         for attrInfo in self.attributes:
             if isinstance(attrInfo,CodeAttribute):
+                return attrInfo
+        return None
+
+    def ConstantValueAttribute(self):
+        for attrInfo in self.attributes:
+            if isinstance(attrInfo,ConstantValueAttribute):
                 return attrInfo
         return None
 

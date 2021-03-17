@@ -34,11 +34,11 @@ def newConstantInfo(tag, cp) -> ConstantInfo:
     elif tag == CONSTANT_Class:
         return ConstantClassInfo(cp)
     elif tag == CONSTANT_Fieldref:
-        return ConstantFieldrefInfo(ConstantMemberrefInfo(cp))
+        return ConstantFieldrefInfo(cp)
     elif tag == CONSTANT_Methodref:
-        return ConstantMethodrefInfo(ConstantMemberrefInfo(cp))
+        return ConstantMethodrefInfo(cp)
     elif tag == CONSTANT_InterfaceMethodref:
-        return ConstantInterfaceMethodrefInfo(ConstantMemberrefInfo(cp))
+        return ConstantInterfaceMethodrefInfo(cp)
     elif tag == CONSTANT_NameAndType:
         return ConstantNameAndTypeInfo()
     elif tag == CONSTANT_MethodType:

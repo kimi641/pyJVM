@@ -1,7 +1,7 @@
 import instructions.base
 import rtda
 
-def _aload(fram:rtda.Frame, index):
+def _aload(frame:rtda.Frame, index):
     ref = frame.LocalVars().GetRef(index)
     frame.OperandStack().PushRef(ref)
 
@@ -99,7 +99,7 @@ class ILOAD_3(instructions.base.NoOperandsInstruction):
 
 def _lload(frame:rtda.Frame, index):
     val = frame.LocalVars().GetLong(index)
-    frame.OperandStack().PUshLong(val)
+    frame.OperandStack().PushLong(val)
 
 class LLOAD(instructions.base.Index8Instruction):
     def Execute(self, frame:rtda.Frame):

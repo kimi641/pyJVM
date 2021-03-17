@@ -1,10 +1,13 @@
 from rtda.slot import newLocalVars, newOperandStack
+import rtda.heap
+
 class Frame:
-    def __init__(self, thread, localVars, operandStack):
-        self.thread = thread
+    def __init__(self, localVars, operandStack, thread, method):
         self.lower = None
         self.localVars = localVars
         self.operandStack = operandStack
+        self.thread = thread
+        self.method = method
         self.nextPC = 0
 
     def LocalVars(self):
@@ -16,6 +19,9 @@ class Frame:
     def Thread(self):
         return self.thread
 
+    def Method(self):
+        return self.method
+
     @property
     def NextPC(self) -> int:
         return self.nextPC
@@ -23,10 +29,11 @@ class Frame:
     def SetNextPC(self, nextPC:int):
         self.nextPC = nextPC
 
-def NewFrame(thread, maxLocals, maxStack:int) -> Frame:
+def NewFrame(thread, method:rtda.heap.Method) -> Frame:
     return Frame(thread = thread,
-                 localVars = newLocalVars(maxLocals),
-                 operandStack = newOperandStack(maxStack))
+                 method = method,
+                 localVars = newLocalVars(method.MaxLocals()),
+                 operandStack = newOperandStack(method.MaxStack()))
 
 class Stack:
     def __init__(self, maxSize:int):
@@ -79,8 +86,8 @@ class Thread:
     def CurrentFrame(self, frame):
         return self.stack.top()
 
-    def NewFrame(self, maxLocals:int, maxStack:int) -> Frame:
-        return NewFrame(self, maxLocals, maxStack)
+    def NewFrame(self, method:rtda.heap.Method) -> Frame:
+        return NewFrame(self, method)
 
 def NewThread() -> Thread:
     return Thread(stack = NewStack(1024))

@@ -8,6 +8,8 @@ from instructions.loads import *
 from instructions.math import *
 from instructions.stack import *
 from instructions.stores import *
+from instructions.reference import *
+from instructions.ldc import *
 
 nop         = NOP()
 aconst_null = ACONST_NULL()
@@ -168,9 +170,12 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
         return BIPUSH()
     elif opcode == 0x11:
         return SIPUSH()
-    #elif opcode == 0x12:
-    #elif opcode == 0x13:
-    #elif opcode == 0x14:
+    elif opcode == 0x12:
+        return LDC()
+    elif opcode == 0x13:
+        return LDC_W()
+    elif opcode == 0x14:
+        return LDC2_W()
     elif opcode == 0x15:
         return ILOAD()
     elif opcode == 0x16:
@@ -206,27 +211,37 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
     elif opcode == 0x25:
         return dload_0
     elif opcode == 0x26:
-        return dload_1
+        return dload_0
     elif opcode == 0x27:
-        return dload_2
+        return dload_1
     elif opcode == 0x28:
-        return dload_3
+        return dload_2
     elif opcode == 0x29:
-        return aload_0
+        return dload_3
     elif opcode == 0x2a:
-        return aload_1
+        return aload_0
     elif opcode == 0x2b:
-        return aload_2
+        return aload_1
     elif opcode == 0x2c:
+        return aload_2
+    elif opcode == 0x2d:
         return aload_3
-    #elif opcode == 0x2d:
     #elif opcode == 0x2e:
+    #    return iaload
     #elif opcode == 0x2f:
+    #    return laload
+    #elif opcode == 0x3-:
+    #    return faload
     #elif opcode == 0x31:
+    #    return daload
     #elif opcode == 0x32:
+    #    return aaload
     #elif opcode == 0x33:
+    #    return baload
     #elif opcode == 0x34:
+    #    return caload
     #elif opcode == 0x35:
+    #    return saload
     elif opcode == 0x36:
         return ISTORE()
     elif opcode == 0x37:
@@ -275,16 +290,24 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
         return astore_1
     elif opcode == 0x4d:
         return astore_2
-    elif opcode == 0x4d:
+    elif opcode == 0x4e:
         return astore_3
     #elif opcode == 0x4f:
+    #    return iastore
     #elif opcode == 0x50:
+    #    return lastore
     #elif opcode == 0x51:
+    #    return fastore
     #elif opcode == 0x52:
+    #    return dastore
     #elif opcode == 0x53:
+    #    return aastore
     #elif opcode == 0x54:
+    #    return bastore
     #elif opcode == 0x55:
+    #    return castore
     #elif opcode == 0x56:
+    #    return sastore
     elif opcode == 0x57:
         return pop
     elif opcode == 0x58:
@@ -448,7 +471,9 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
     elif opcode == 0xa7:
         return GOTO()
     #elif opcode == 0xa8:
+    #    return &JSR()
     #elif opcode == 0xa9:
+    #    return &RET()
     elif opcode == 0xaa:
         return TABLE_SWITCH()
     elif opcode == 0xab:
@@ -459,22 +484,31 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
     #elif opcode == 0xaf:
     #elif opcode == 0xb0:
     #elif opcode == 0xb1:
-    #elif opcode == 0xb2:
-    #elif opcode == 0xb3:
-    #elif opcode == 0xb4:
-    #elif opcode == 0xb5:
-    #elif opcode == 0xb6:
-    #elif opcode == 0xb7:
+    elif opcode == 0xb2:
+        return GET_STATIC()
+    elif opcode == 0xb3:
+        return PUT_STATIC()
+    elif opcode == 0xb4:
+        return GET_FIELD()
+    elif opcode == 0xb5:
+        return PUT_FIELD()
+    elif opcode == 0xb6:
+        return INVOKE_VIRTUAL()
+    elif opcode == 0xb7:
+        return INVOKE_SPECIAL()
     #elif opcode == 0xb8:
     #elif opcode == 0xb9:
     #elif opcode == 0xba:
-    #elif opcode == 0xbb:
+    elif opcode == 0xbb:
+        return NEW()
     #elif opcode == 0xbc:
     #elif opcode == 0xbd:
     #elif opcode == 0xbe:
     #elif opcode == 0xbf:
-    #elif opcode == 0xc0:
-    #elif opcode == 0xc1:
+    elif opcode == 0xc0:
+        return CHECK_CAST()
+    elif opcode == 0xc1:
+        return INSTANCE_OF()
     #elif opcode == 0xc2:
     #elif opcode == 0xc3:
     elif opcode == 0xc4:
@@ -491,4 +525,4 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
     #elif opcode == 0xfe:
     #elif opcode == 0xff:
     else:
-        raise ValueError(f"Unsupported opcode:{opcode}")
+        raise ValueError(f"Unsupported opcode:{hex(opcode)}")

@@ -3,6 +3,7 @@ import argparse
 import classpath
 import classfile
 
+from rtda import heap
 from interpreter import interpret
 
 __version__ = "0.0.1"
@@ -40,10 +41,11 @@ def getMainMethod(cf:classfile.ClassFile) -> classfile.MemberInfo:
 def startJVM(args):
     cp = classpath.Parse(args.Xjre, args.classpath)
     print(f"classpath:{cp}, class{args.Class}, args: {args}")
+    classLoader = heap.NewClassLoader(cp)
     className = args.Class.replace(".","/")
-    cf = loadClass(className, cp)
-    print (args.Class)
-    mainMethod = getMainMethod(cf)
+    #cf = loadClass(className, cp)
+    mainClass = classLoader.LoadClass(className)
+    mainMethod = mainClass.GetMainMethod()
     if mainMethod != None:
         interpret(mainMethod)
     else:

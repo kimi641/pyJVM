@@ -90,6 +90,18 @@ class CodeAttribute(AttributeInfo):
         self.exceptionTable = readExceptionTable(reader)
         self.attributes = readAttributes(reader, self.cp)
 
+    @property
+    def MaxStack(self):
+        return self.maxStack
+
+    @property
+    def MaxLocals(self):
+        return self.maxLocals
+
+    @property
+    def Code(self):
+        return self.code
+
 class LineNumberTableEntry:
     def __init__(self, startPc, lineNumber):
         self.startPc = startPc

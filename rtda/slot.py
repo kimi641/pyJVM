@@ -1,7 +1,7 @@
 import struct
 class Slot:
     def __init__(self):
-        self.num = None
+        self.num = 0
         self.ref = None
 
 class LocalVars(list):
