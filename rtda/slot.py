@@ -42,6 +42,9 @@ class LocalVars(list):
     def GetRef(self, index:int):
         return self[index].ref
 
+    def SetSlot(self, index:int, slot:Slot):
+        self[index] = slot
+
 def newLocalVars(maxLocals:int):
     if maxLocals > 0:
         lv = LocalVars()
@@ -109,6 +112,9 @@ class OperandStack:
     def PopSlot(self):
         self.size -= 1
         return self.slots[self.size]
+
+    def GetRefFromTop(self, n:int):
+        return self.slots[self.size-1-n].ref
 
 def newOperandStack(maxStack:int) -> OperandStack:
     if maxStack > 0:

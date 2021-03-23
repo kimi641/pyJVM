@@ -39,3 +39,48 @@ class TABLE_SWITCH:
         else:
             offset = int(self.defaultOffset)
         instructions.base.Branch(frame, offset)
+
+class RETURN(instructions.base.NoOperandsInstruction): # Return void
+    def Execute(self, frame:rtda.Frame):
+        frame.Thread().PopFrame()
+
+class ARETURN(instructions.base.NoOperandsInstruction): # Return reference
+    def Execute(self, frame:rtda.Frame):
+        thread = frame.Thread()
+        currentFrame = thread.PopFrame()
+        invokerFrame = thread.TopFrame()
+        ref = currentFrame.OperandStack().PopRef()
+        invokerFrame.OperandStack().PushRef(ref)
+
+class DRETURN(instructions.base.NoOperandsInstruction): # Return double
+    def Execute(self, frame:rtda.Frame):
+        thread = frame.Thread()
+        currentFrame = thread.PopFrame()
+        invokerFrame = thread.TopFrame()
+        retVal = currentFrame.OperandStack().PopDouble()
+        invokerFrame.OperandStack().PushDouble(retVal)
+
+class FRETURN(instructions.base.NoOperandsInstruction): # Return float
+    def Execute(self, frame:rtda.Frame):
+        thread = frame.Thread()
+        currentFrame = thread.PopFrame()
+        invokerFrame = thread.TopFrame()
+        retVal = currentFrame.OperandStack().PopFloat()
+        invokerFrame.OperandStack().PushFloat(retVal)
+
+class IRETURN(instructions.base.NoOperandsInstruction): # Return Int
+    def Execute(self, frame:rtda.Frame):
+        thread = frame.Thread()
+        currentFrame = thread.PopFrame()
+        invokerFrame = thread.TopFrame()
+        retVal = currentFrame.OperandStack().PopInt()
+        invokerFrame.OperandStack().PushInt(retVal)
+
+class LRETURN(instructions.base.NoOperandsInstruction): # Return Long
+    def Execute(self, frame:rtda.Frame):
+        thread = frame.Thread()
+        currentFrame = thread.PopFrame()
+        invokerFrame = thread.TopFrame()
+        retVal = currentFrame.OperandStack().PopLong()
+        invokerFrame.OperandStack().PushLong(retVal)
+

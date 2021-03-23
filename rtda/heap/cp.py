@@ -26,10 +26,56 @@ def newClassRef(cp,
     ref.className = classInfo.Name
     return ref
 
+def lookupMethodInClass(_class, name:str, descriptor:str):
+    c = _class
+    while c != None:
+        for method in c.methods:
+            if method.name == name and \
+               method.descriptor == descriptor:
+                return method
+        c = c.superClass
+    return None
+
+def lookupMethod(_class, name:str, descriptor:str):
+    method = lookupMethodInClass(_class, name, descriptor)
+    if method == None:
+        method = lookupMethodInInterfaces(_class.interfaces, name, descriptor)
+    return method
+
+def lookupMethodInInterfaces(ifaces, name:str, descriptor:str):
+    for iface in ifaces:
+        for method in iface.methods:
+            if method.name == name and \
+               method.descriptor == descriptor:
+                return method
+        method = lookupMethodInInterfaces(iface.interfaces, name, descriptor)
+        if method != None:
+            return method
+    return None
+
 class MemberRef(SymRef):
     def copyMemberRefInfo(self, refInfo:classfile.ConstantMemberrefInfo):
         self.className = refInfo.ClassName
         self.name, self.descriptor = refInfo.NameAndDescriptor
+
+    def resolveMethodRef(self):
+        d = self.cp._class
+        c = self.ResolvedClass()
+        if c.IsInterface():
+            raise ValueError("java.lang.IncompativleClassChangeError")
+
+        method = lookupMethod(c, self.name, self.descriptor)
+        if method == None:
+            raise ValueError("java.lang.NoSuchMethodError")
+        if not method.isAccessibleTo(d):
+            raise ValueError("java.lang.IllegalAccessError")
+
+        self.method = method
+
+    def ResolvedMethod(self):
+        if self.method == None:
+            self.resolveMethodRef()
+        return self.method
 
     def Name(self) -> str:
         return self.name
@@ -54,8 +100,8 @@ def lookupField(c, name:str, descriptor:str):
 
 class FieldRef(MemberRef):
     def __init__(self):
-        self.field = None
         super().__init__()
+        self.field = None
 
     def resolveFieldRef(self):
         d = self.cp._class
@@ -83,13 +129,28 @@ def newFieldRef(cp,
     return ref
 
 class MethodRef(MemberRef):
-    def resolveMethodRef(self):
-        pass
+    def __init__(self):
+        super().__init__()
+        self.method = None
 
     def ResolvedMethod(self):
         if self.method == None:
             self.resolveMethodRef()
         return self.method
+
+    def resolveMethodRef(self):
+        d = self.cp._class
+        c = self.ResolvedClass()
+        if c.IsInterface():
+            raise ValueError("java.lang.IncompatibleClassChangeError")
+
+        method = lookupMethod(c, self.name, self.descriptor)
+        if method == None:
+            raise ValueError("java.lang.NoSuchMethodError")
+        if not method.isAccessibleTo(d):
+            raise ValueError("java.lang.IllegalAccessError")
+
+        self.method = method
 
 def newMethodRef(cp,
                  refInfo:classfile.ConstantMethodrefInfo) -> MethodRef:
@@ -98,9 +159,30 @@ def newMethodRef(cp,
     ref.copyMemberRefInfo(refInfo)
     return ref
 
+def lookupInterfaceMethod(iface, name:str, descriptor:str):
+    for method in iface.methods:
+        if method.name == name and \
+           method.descriptor == descriptor:
+            return method
+        return lookupMethodInInterfaces(iface.interfaces, name, descriptor)
+
 class InterfaceMethodRef(MemberRef):
-    def resloveInterfaceMethodRef(self):
-        pass
+    def __init__(self):
+        super().__init__()
+        self.method = None
+
+    def resolveInterfaceMethodRef(self):
+        d = self.cp._class
+        c = self.ResolvedClass()
+        if not c.IsInterface():
+            raise ValueError("java.lang.IncompatibleClassChangeError")
+        method = lookupInterfaceMethod(c, self.name, self.descriptor)
+        if method == None:
+            raise ValueError("java.lang.NoSuchMethodError")
+        if not method.isAccessibleTo(d):
+            raise ValueError("java.lang.IllegalAccessError")
+
+        self.method = method
 
     def ResolvedInterfaceMethod(self):
         if self.method == None:

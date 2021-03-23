@@ -41,13 +41,13 @@ def getMainMethod(cf:classfile.ClassFile) -> classfile.MemberInfo:
 def startJVM(args):
     cp = classpath.Parse(args.Xjre, args.classpath)
     print(f"classpath:{cp}, class{args.Class}, args: {args}")
-    classLoader = heap.NewClassLoader(cp)
+    classLoader = heap.NewClassLoader(cp, args.verboseClassFlag)
     className = args.Class.replace(".","/")
     #cf = loadClass(className, cp)
     mainClass = classLoader.LoadClass(className)
     mainMethod = mainClass.GetMainMethod()
     if mainMethod != None:
-        interpret(mainMethod)
+        interpret(mainMethod, args.verboseInstFlag)
     else:
         print(f"Main method not found in class {args.Class}")
     #printClassInfo(cf)
@@ -64,6 +64,8 @@ def main():
     parser = argparse.ArgumentParser()
     #parser.add_argument("-?","--help", help="print help message")
     parser.add_argument("-v","--version", action="version", version="%(prog)s 0.0.1", help="print version and exit")
+    parser.add_argument("--verboseClassFlag", action='store_true', help="ClassFlag")
+    parser.add_argument("--verboseInstFlag", action='store_true', help="InstFlag")
     parser.add_argument("-cp","--classpath", help="classpath")
     parser.add_argument("--Xjre", help="memory")
     parser.add_argument("Class", type=str, help="class")

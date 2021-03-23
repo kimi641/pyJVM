@@ -30,7 +30,7 @@ class LADD(instructions.base.NoOperandsInstruction):
     def Execute(self, frame:rtda.Frame):
         stack = frame.OperandStack()
         v2 = stack.PopLong()
-        v1 = statk.PopLong()
+        v1 = stack.PopLong()
         result = v1 + v2
         stack.PushLong(result)
 

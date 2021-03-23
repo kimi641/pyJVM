@@ -24,7 +24,7 @@ class LDC_W(instructions.base.Index16Instruction):
 class LDC2_W(instructions.base.Index16Instruction):
     def Execute(self, frame: rtda.Frame):
         stack = frame.OperandStack()
-        cp = frame.Method().Class().COnstantPool()
+        cp = frame.Method().Class().ConstantPool()
         c = cp.GetConstant(self.Index)
 
         if isinstance(c,int):

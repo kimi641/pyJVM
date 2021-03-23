@@ -29,6 +29,9 @@ class Frame:
     def SetNextPC(self, nextPC:int):
         self.nextPC = nextPC
 
+    def RevertNextPC(self):
+        self.nextPC = self.thread.pc
+
 def NewFrame(thread, method:rtda.heap.Method) -> Frame:
     return Frame(thread = thread,
                  method = method,
@@ -62,6 +65,9 @@ class Stack:
         if self._top == None:
             raise IndexError("jvm stack is empty!")
         return self._top
+
+    def isEmpty(self) -> bool:
+        return self._top == None
     
 def NewStack(maxSize:int) -> Stack:
     return Stack(maxSize = maxSize)
@@ -83,11 +89,17 @@ class Thread:
     def PopFrame(self):
         return self.stack.pop()
 
-    def CurrentFrame(self, frame):
+    def CurrentFrame(self) -> Frame:
+        return self.stack.top()
+
+    def TopFrame(self) -> Frame:
         return self.stack.top()
 
     def NewFrame(self, method:rtda.heap.Method) -> Frame:
         return NewFrame(self, method)
+
+    def IsStackEmpty(self) -> bool:
+        return self.stack.isEmpty()
 
 def NewThread() -> Thread:
     return Thread(stack = NewStack(1024))
