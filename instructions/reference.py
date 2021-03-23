@@ -10,6 +10,11 @@ class NEW(instructions.base.Index16Instruction):
         classRef = cp.GetConstant(self.Index)
         _class = classRef.ResolvedClass()
 
+        if not _class.InitStarted():
+            frame.RevertNextPC()
+            instructions.base.InitClass(frame.Thread(), _class)
+            return
+
         if _class.IsInterface() or _class.IsAbstract():
             raise ValueError("java.lang.InstantiationError")
 
@@ -24,11 +29,15 @@ class PUT_STATIC(instructions.base.Index16Instruction):
         fieldRef = cp.GetConstant(self.Index)
         field = fieldRef.ResolvedField()
         _class = field.Class()
+        if not _class.InitStarted():
+            frame.RevertNextPC()
+            instructions.base.InitClass(frame.Thread(), _class)
+            return
 
         if not field.IsStatic():
             raise ValueError("java.lang.IncompatibleClassChangeError")
         if field.IsFinal():
-            if currentClass != _class or currentMethod.Nmae() != "<clinit>":
+            if currentClass != _class or currentMethod.Name() != "<clinit>":
                 raise ValueError("java.lang.IllegalAccessError")
 
         descriptor = field.Descriptor()
@@ -53,6 +62,10 @@ class GET_STATIC(instructions.base.Index16Instruction):
         fieldRef = cp.GetConstant(self.Index)
         field = fieldRef.ResolvedField()
         _class = field.Class()
+        if not _class.InitStarted():
+            frame.RevertNextPC()
+            instructions.base.InitClass(frame.Thread(), _class)
+            return
 
         if not field.IsStatic():
             raise ValueError("java.lang.IncompatibleClassChangeError")
