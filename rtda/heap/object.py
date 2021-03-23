@@ -3,6 +3,7 @@ from typing import List
 import classfile
 from rtda.slot import LocalVars as Slots, newLocalVars as newSlots
 from rtda.heap.cp import newClassRef, newFieldRef, newMethodRef, newInterfaceMethodRef
+from rtda.heap.method_descriptor import *
 
 ACC_PUBLIC          = 0x0001 #class field method
 ACC_PRIVATE         = 0x0002 #      field method
@@ -44,6 +45,8 @@ def newObject(_class):
 class Class:
     def __init__(self):
         self.superClass = None
+        self.interfaces = []
+        self.initStarted = False
 
     def IsPublic(self) -> bool:
         return 0 != self.accessFlags & ACC_PUBLIC
@@ -69,29 +72,6 @@ class Class:
     def IsEnum(self) -> bool:
         return 0 != self.accessFlags & ACC_ENUM
 
-    def isSubClassOf(self, other) -> bool:
-        c = self.superClass
-        while c != None:
-            c = c.superClass
-            if c == other:
-                return True
-        return False
-
-    def isSubInterfaceOf(self, iface) -> bool:
-        for superInterface in self.interfaces:
-            if superInterface == iface or superInterface.isSubInterfaceOf(iface):
-                return True
-        return False
-
-    def isImplements(self, iface) -> bool:
-        c = self.superClass
-        while c != None:
-            c = c.superClass
-            for i in c.interfaces:
-                if i == iface or i.isSubInterfaceOf(iface):
-                    return True
-        return False
-
     def isAssignableFrom(self, other) -> bool:
         s, t = other, self
         if s == t:
@@ -101,11 +81,55 @@ class Class:
         else:
             return s.isImplements(t)
 
+    def IsSubClassOf(self, other) -> bool:
+        c = self.superClass
+        while c != None:
+            c = c.superClass
+            if c == other:
+                return True
+        return False
+
+    def IsImplements(self, iface) -> bool:
+        c = self
+        while c != None:
+            for i in c.interfaces:
+                if i == iface or i.isSubInterfaceOf(iface):
+                    return True
+            c = c.superClass
+        return False
+
+    def isSubInterfaceOf(self, iface) -> bool:
+        for superInterface in self.interfaces:
+            if superInterface == iface or superInterface.isSubInterfaceOf(iface):
+                return True
+        return False
+
+    def IsSuperClassOf(self, other) -> bool:
+        return other.IsSubClassOf(self)
+
+    def Name(self):
+        return self.name
+
+    def Field(self):
+        return self.fields
+
+    def Methods(self):
+        return self.methods
+
     def ConstantPool(self):
         return self.constantPool
 
+    def SuperClass(self):
+        return self.superClass
+
     def StaticVars(self):
         return self.staticVars
+
+    def InitStarted(self) -> bool:
+        return self.initStarted
+
+    def StartInit(self):
+        self.initStarted = True
 
     def isAccessibleTo(self, other) -> bool:
         return self.IsPublic() or self.getPackageName() == other.getPackageName()
@@ -126,6 +150,9 @@ class Class:
 
     def GetMainMethod(self):
         return self.getStaticMethod("main", "([Ljava/lang/String;)V")
+
+    def GetClinitMethod(self):
+        return self.getStaticMethod("<clinit>", "()V")
 
     def NewObject(self):
         return newObject(self)
@@ -225,6 +252,12 @@ def newFields(_class:Class, cfFields:List[classfile.MemberInfo]) -> List[Field]:
     return fields
 
 class Method(ClassMember):
+    def __init__(self):
+        super().__init__()
+        self.maxStack = 0
+        self.maxLocals = 0
+        self.argSlotCount = 0
+
     def copyAttributes(self, cfMethod:classfile.MemberInfo):
         codeAttr = cfMethod.CodeAttribute
         if codeAttr != None:
@@ -259,6 +292,18 @@ class Method(ClassMember):
     def Code(self):
         return self.code
 
+    def ArgSlotCount(self):
+        return self.argSlotCount
+
+    def calcArgSlotCount(self):
+        parsedDescriptor = parseMethodDescriptor(self.descriptor)
+        for paramType in parsedDescriptor.parameterTypes:
+            self.argSlotCount += 1
+            if paramType == "J" or paramType == "D":
+                self.argSlotCount += 1
+        if not self.IsStatic():
+            self.argSlotCount += 1
+
 def newMethods(_class:Class, cfMethods: List[classfile.MemberInfo]) -> List[Method]:
     methods = []
     for cfMethod in cfMethods:
@@ -266,6 +311,7 @@ def newMethods(_class:Class, cfMethods: List[classfile.MemberInfo]) -> List[Meth
         method._class = _class
         method.copyMemberInfo(cfMethod)
         method.copyAttributes(cfMethod)
+        method.calcArgSlotCount()
         methods.append(method)
     return methods
 

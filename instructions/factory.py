@@ -132,6 +132,12 @@ fcmpl       = FCMPL()
 fcmpg       = FCMPG()
 dcmpl       = DCMPL()
 dcmpg       = DCMPG()
+ireturn     = IRETURN()
+lreturn     = LRETURN()
+freturn     = FRETURN()
+dreturn     = DRETURN()
+areturn     = ARETURN()
+_return     = RETURN()
 
 def NewInstruction(opcode) -> instructions.base.Instruction:
     if opcode == 0x00:
@@ -478,12 +484,18 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
         return TABLE_SWITCH()
     elif opcode == 0xab:
         return LOOKUP_SWITCH()
-    #elif opcode == 0xac:
-    #elif opcode == 0xad:
-    #elif opcode == 0xae:
-    #elif opcode == 0xaf:
-    #elif opcode == 0xb0:
-    #elif opcode == 0xb1:
+    elif opcode == 0xac:
+        return ireturn
+    elif opcode == 0xad:
+        return lreturn
+    elif opcode == 0xae:
+        return freturn
+    elif opcode == 0xaf:
+        return dreturn
+    elif opcode == 0xb0:
+        return areturn
+    elif opcode == 0xb1:
+        return _return
     elif opcode == 0xb2:
         return GET_STATIC()
     elif opcode == 0xb3:
@@ -496,8 +508,10 @@ def NewInstruction(opcode) -> instructions.base.Instruction:
         return INVOKE_VIRTUAL()
     elif opcode == 0xb7:
         return INVOKE_SPECIAL()
-    #elif opcode == 0xb8:
-    #elif opcode == 0xb9:
+    elif opcode == 0xb8:
+        return INVOKE_STATIC()
+    elif opcode == 0xb9:
+        return INVOKE_INTERFACE()
     #elif opcode == 0xba:
     elif opcode == 0xbb:
         return NEW()

@@ -187,31 +187,132 @@ class CHECK_CAST(instructions.base.Index16Instruction):
 # hack
 class INVOKE_SPECIAL(instructions.base.Index16Instruction):
     def Execute(self, frame:rtda.Frame):
-        ref = frame.OperandStack().PopRef()
+        currentClass = frame.Method().Class()
+        cp = currentClass.ConstantPool()
+        methodRef = cp.GetConstant(self.Index)
+        resolvedClass = methodRef.ResolvedClass()
+        resolvedMethod = methodRef.ResolvedMethod()
+        if resolvedMethod.Name() ==  "<init>" and \
+           resolvedMethod.Class() != resolvedClass:
+            raise ValueError("java.lang.NoSuchMethodError")
+        if resolvedMethod.IsStatic():
+            raise ValueError("java.lang.IncompatibleClassChangeError")
+
+        ref = frame.OperandStack().GetRefFromTop(resolvedMethod.ArgSlotCount() - 1)
+        if ref == None:
+            raise ValueError("java.lang.NullPointerException")
+
+        if resolvedMethod.IsProtected() and \
+           resolvedMethod.Class().IsSuperClassOf(currentClass) and \
+           resolvedMethod.Class().GetPackageName() != currentClass.GetPackageName() and \
+           ref.Class() != currentClass and \
+           not ref.Class().IsSubClassOf(currentClass):
+            raise ValueError("java.lang.IllegalAccessError")
+
+        methodToBeInvoked = resolvedMethod
+        if currentClass.IsSuper() and \
+           resolvedClass.IsSuperClassOf(currentClass) and \
+           resolvedMethod.Name() != "<init>":
+            methodToBeInvoked = rtda.heap.lookMethodInClass(currentClass.SuperClass(), \
+                                    methodRef.Name(), methodRef.Descriptor())
+        if methodToBeInvoked == None or methodToBeInvoked.IsAbstract():
+            raise ValueError("java.lang.AbstractMethodError")
+
+        instructions.base.InvokeMethod(frame, methodToBeInvoked)
+
+def _println(stack, descriptor:str):
+    if descriptor == "(Z)V":
+        print(f"{stack.PopInt() != 0}")
+    elif descriptor == "(C)V":
+        print(f"{stack.PopInt()}")
+    elif descriptor == "(B)V":
+        print(f"{stack.PopInt()}")
+    elif descriptor == "(S)V":
+        print(f"{stack.PopInt()}")
+    elif descriptor == "(I)V":
+        print(f"{stack.PopInt()}")
+    elif descriptor == "(J)V":
+        print(f"{stack.PopLong()}")
+    elif descriptor == "(F)V":
+        print(f"{stack.PopFloat()}")
+    elif descriptor == "(D)V":
+        print(f"{stack.PopDouble()}")
+    else:
+        raise ValueError(f"println: {methodRef.Descriptor()}")
+    stack.PopRef()
 
 # hack
 class INVOKE_VIRTUAL(instructions.base.Index16Instruction):
     def Execute(self, frame:rtda.Frame):
+        currentClass = frame.Method().Class()
         cp = frame.Method().Class().ConstantPool()
         methodRef = cp.GetConstant(self.Index)
-        if methodRef.Name() == "println":
-            stack = frame.OperandStack()
-            if methodRef.Descriptor() == "(Z)V":
-                print(f"{stack.PopInt() != 0}")
-            elif methodRef.Descriptor() == "(C)V":
-                print(f"{stack.PopInt()}")
-            elif methodRef.Descriptor() == "(B)V":
-                print(f"{stack.PopInt()}")
-            elif methodRef.Descriptor() == "(S)V":
-                print(f"{stack.PopInt()}")
-            elif methodRef.Descriptor() == "(I)V":
-                print(f"{stack.PopInt()}")
-            elif methodRef.Descriptor() == "(J)V":
-                print(f"{stack.PopLong()}")
-            elif methodRef.Descriptor() == "(F)V":
-                print(f"{stack.PopFloat()}")
-            elif methodRef.Descriptor() == "(D)V":
-                print(f"{stack.PopDouble()}")
-            else:
-                raise ValueError(f"println: {methodRef.Descriptor()}")
-            stack.PopRef()
+        resolvedMethod = methodRef.ResolvedMethod()
+        if resolvedMethod.IsStatic():
+            raise ValueError("java.lang.IncompatibleClassChangeError")
+
+        ref = frame.OperandStack().GetRefFromTop(resolvedMethod.ArgSlotCount() - 1)
+        if ref == None:
+            # hack System.out.println()
+            if methodRef.Name() == "println":
+                _println(frame.OperandStack(), methodRef.Descriptor())
+                return
+            raise ValueError("java.lang.NullPointerException")
+
+        if resolvedMethod.IsProtected() and \
+           resolvedMethod.Class().IsSuperClassOf(currentClass) and \
+           resolvedMethod.Class().GetPackageName() != currentClass.GetPackageName() and \
+           ref.Class() != currentClass and \
+           not ref.Class().IsSubClassOf(currentClass):
+            raise ValueError("java.lang.IllegalAccessError")
+
+        methodToBeInvoked = rtda.heap.lookupMethodInClass(ref.Class(), \
+                                methodRef.Name(), methodRef.Descriptor())
+        if methodToBeInvoked == None or methodToBeInvoked.IsAbstract():
+            raise ValueError("java.lang.AbstractMethodError")
+
+        instructions.base.InvokeMethod(frame, methodToBeInvoked)
+
+class INVOKE_STATIC(instructions.base.Index16Instruction):
+    def Execute(self, frame:rtda.Frame):
+        cp = frame.Method().Class().ConstantPool()
+        methodRef = cp.GetConstant(self.Index)
+        resolvedMethod = methodRef.ResolvedMethod()
+        if not resolvedMethod.IsStatic():
+            raise ValueError(f"java.lang.IncompativleClassChangeError")
+
+        _class = resolvedMethod.Class()
+        if not _class.InitStarted():
+            frame.RevertNextPC()
+            instructions.base.InitClass(frame.Thread(), _class)
+            return
+
+        instructions.base.InvokeMethod(frame, resolvedMethod)
+
+class INVOKE_INTERFACE:
+    def FetchOperands(self, reader:instructions.base.BytecodeReader):
+        self.index = reader.ReadUint16()
+        reader.ReadUint8()
+        reader.ReadUint8()
+
+    def Execute(self, frame:rtda.Frame):
+        cp = frame.Method().Class().ConstantPool()
+        methodRef = cp.GetConstant(self.index)
+        resolvedMethod = methodRef.ResolvedInterfaceMethod()
+        if resolvedMethod.IsStatic() or resolvedMethod.IsPrivate():
+            raise ValueError(f"java.lang.IncompativleClassChangeError")
+
+        ref = frame.OperandStack().GetRefFromTop(resolvedMethod.ArgSlotCount() - 1)
+        if ref == None:
+            raise ValueError("java.lang.NullPointerException")
+        if not ref.Class().IsImplements(methodRef.ResolvedClass()):
+            raise ValueError(f"java.lang.IncompativleClassChangeError")
+
+        methodToBeInvoked = rtda.heap.lookupMethodInClass(ref.Class(), \
+                                methodRef.Name(), methodRef.Descriptor())
+        if methodToBeInvoked == None or methodToBeInvoked.IsAbstract():
+            raise ValueError("java.lang.AbstractMethodError")
+        if not methodToBeInvoked.IsPublic():
+            raise ValueError("java.lang.IllegalAccessError")
+
+        instructions.base.InvokeMethod(frame, methodToBeInvoked)

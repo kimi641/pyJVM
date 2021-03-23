@@ -86,8 +86,9 @@ def link(_class:Class):
     perpare(_class)
 
 class ClassLoader:
-    def __init__(self,cp:classpath.Classpath,classMap:List[Class]):
+    def __init__(self,cp:classpath.Classpath,verboseFlag:bool,classMap:List[Class]):
         self.cp = cp
+        self.verboseFlag = verboseFlag
         self.classMap = classMap
 
     def LoadClass(self, name:str) -> Class:
@@ -99,7 +100,8 @@ class ClassLoader:
         data, entry = self.readClass(name)
         _class = self.defineClass(data)
         link(_class)
-        print(f"[Loaded {name} from {entry}]")
+        if self.verboseFlag:
+            print(f"[Loaded {name} from {entry}]")
         return _class
 
     def readClass(self, name:str) -> Tuple[List, classpath.Entry]:
@@ -116,5 +118,5 @@ class ClassLoader:
         self.classMap[_class.name] = _class
         return _class
 
-def NewClassLoader(cp:classpath.Classpath) -> ClassLoader:
-    return ClassLoader(cp,{})
+def NewClassLoader(cp:classpath.Classpath, verboseFlag:bool) -> ClassLoader:
+    return ClassLoader(cp,verboseFlag,{})
